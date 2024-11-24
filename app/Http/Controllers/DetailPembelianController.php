@@ -45,7 +45,7 @@ class DetailPembelianController extends Controller
 
     public function show(string $id, string $uuid)
     {
-        return response()->json(['data' => DetailPembelian::where('uuid', $uuid)->firstOrFail()]);
+        return response()->json(['data' => $this->detailPembelianService->detail($uuid)]);
     }
 
     public function update(DetailPembelianRequest $request, string $uuid, string $id)

@@ -57,7 +57,10 @@ class DetailPembelianService
             ]);
         }
     }
-
+    public function detail(string $uuid)
+    {
+        return  DetailPembelian::where('uuid', $uuid)->firstOrFail();
+    }
     public function edit(string $id, array $data)
     {
         $total_harga_beli =  $data['quantity'] * $data['harga_beli'];

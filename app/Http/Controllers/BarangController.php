@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+use App\Service\BarangService;
 use Illuminate\Http\Request;
 use DataTable;
 use Yajra\DataTables\DataTables;
@@ -11,39 +12,19 @@ use Yajra\DataTables\DataTables;
 
 class BarangController extends Controller
 {
-    public function __construct()
+    public function __construct(private BarangService $barangService)
     {
         $this->middleware('auth');
     }
     public function index(Request $request)
     {
-        $product = Barang::latest()->get();
-        if (request()->ajax()) {
-            return DataTables::of($product)
-                ->addIndexColumn()
-
-                ->addColumn('action', function ($row) {
-
-                    $btn = '<button type="button" class="btn btn-success" onclick="showDetailModal(this)" data-id="' . $row->uuid . '">Detail
-</button>';
-
-                    // $btn = $btn . ' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="' . $row->id . '" data-original-title="Delete" class="btn btn-danger btn-sm deleteProduct">Delete</a>';
-
-                    return $btn;
-                })
-                ->rawColumns(['action'])
-                ->make(true);
-        }
-
-        // }
-        return view('barang.index');
+        return $this->barangService->getDataTable();
     }
 
-    public function show(string $id)
+    public function show(string $uuid)
     {
         return response()->json([
-            'data' => Barang::where('uuid', $id)->first(),
+            'data' => $this->barangService->detail($uuid),
         ]);
     }
-    public function serversideTable(Request $request) {}
 }
