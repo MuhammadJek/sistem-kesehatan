@@ -39,7 +39,7 @@ class PembelianService
     }
     public function getDataTable()
     {
-        $pembelianGet = HeaderPembelian::latest()->get();
+        $pembelianGet = HeaderPembelian::with(['supplier'])->latest()->get();
         if (request()->ajax()) {
             return DataTables::of($pembelianGet)
                 ->addIndexColumn()
@@ -60,7 +60,6 @@ class PembelianService
         $supplier = Supplier::all();
         // }
         // dd($pembelian->pluck('id')->isEmpty() ? 'B' . date('Ym') . str_pad(1, 3, '0', STR_PAD_LEFT) : 'B' . date('Ym') . str_pad($pembelian->pluck('id')->last() + 1, 3, '0', STR_PAD_LEFT));
-        return view('pembelian.index', compact('supplier'));    
+        return view('pembelian.index', compact('supplier'));
     }
-    
 }

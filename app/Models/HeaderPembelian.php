@@ -23,6 +23,6 @@ class HeaderPembelian extends Model
 
     public function detail_pembelian()
     {
-        return $this->hasMany(DetailPembelian::class);
+        return $this->hasMany(DetailPembelian::class, 'no_transaksi', 'no_transaksi');
     }
 }

@@ -45,6 +45,7 @@
                                         <th>id</th>
                                         <th>No Transaksi</th>
                                         <th>Kode supplier</th>
+                                        <th>Nama supplier</th>
                                         <th class="text-center">tanggal beli</th>
                                         <th>Action</th>
                                     </tr>
@@ -100,7 +101,10 @@
                             data: 'kode_supplier',
                             name: 'kode_supplier',
                         },
-
+                        {
+                            data: 'supplier.nama_supplier',
+                            name: 'supplier.nama_supplier',
+                        },
                         {
                             data: 'tanggal_beli',
                             name: 'tanggal_beli',

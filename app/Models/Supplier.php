@@ -18,6 +18,6 @@ class Supplier extends Model
 
     public function header_pembelians()
     {
-        return $this->hasMany(HeaderPembelian::class);
+        return $this->hasMany(HeaderPembelian::class, 'kode_supplier', 'kode_supplier');
     }
 }
