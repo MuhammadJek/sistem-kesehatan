@@ -2,23 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Supplier;
+use App\Models\DetailPembelian;
+use App\Models\Stock;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 
-class SupplierController extends Controller
+class StockController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth');
     }
-    public function index(Request $request)
+    public function index()
     {
-        $product = Supplier::latest()->get();
-        if (request()->ajax()) {
-            return DataTables::of($product)
-                ->addIndexColumn()
 
+        $stock = Stock::get();
+        if (request()->ajax()) {
+            return DataTables::of($stock)
+                ->addIndexColumn()
+                ->editColumn('nama_barang', function ($data) {
+                    return $data->barang->nama_barang;
+                })
                 ->addColumn('action', function ($row) {
 
                     $btn = '<button type="button" class="btn btn-success" onclick="showDetailModal(this)" data-id="' . $row->uuid . '">Detail
@@ -28,17 +32,15 @@ class SupplierController extends Controller
 
                     return $btn;
                 })
+
                 ->rawColumns(['action'])
                 ->make(true);
         }
-
-        // }
-        return view('supplier.index');
+        return view('stock.index');
     }
-    public function show(string $id)
+
+    public function show(string $uuid)
     {
-        return response()->json([
-            'data' => Supplier::where('uuid', $id)->first(),
-        ]);
+        return response()->json(['data' => Stock::with('barang')->where('uuid', $uuid)->firstOrFail()]);
     }
 }

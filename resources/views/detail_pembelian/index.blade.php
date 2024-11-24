@@ -9,7 +9,7 @@
                 <h1>Detail Barang Pembelian</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="#">Pembelian</a></div>
+                    <div class="breadcrumb-item"><a href="{{ route('transaksi.index') }}">Pembelian</a></div>
                     <div class="breadcrumb-item">Detail Pembelian</div>
                 </div>
             </div>
@@ -54,7 +54,7 @@
                                         <th>Diskon</th>
                                         <th>Total Diskon Harga </th>
                                         <th class="text-center">Total Harga</th>
-                                        <th>Action</th>
+                                        <th style="width: auto;">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -71,6 +71,8 @@
     </div>
 
     @include('detail_pembelian.modal-form')
+    @include('detail_pembelian.modal-detail')
+
     @include('layouts.footer')
 
     @push('scripts')
@@ -80,12 +82,28 @@
         {!! JsValidator::formRequest('App\Http\Requests\DetailPembelianRequest', '#detailPembelianForm') !!}
         <script>
             let save_method;
+            var notransaksi = "{{ $pembelian->no_transaksi }}";
             $(document).ready(function() {
                 pembelianTable();
             });
 
+            function formatRupiah(angka) {
+                var number_string = angka.toString().replace(/[^,\d]/g, ''),
+                    split = number_string.split(','),
+                    sisa = split[0].length % 3,
+                    rupiah = split[0].substr(0, sisa),
+                    ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+                if (ribuan) {
+                    separator = sisa ? '.' : '';
+                    rupiah += separator + ribuan.join('.');
+                }
+
+                rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+                return 'Rp ' + rupiah;
+            }
+
             function pembelianTable() {
-                var notransaksi = "{{ $pembelian->no_transaksi }}";
                 $('#data-table').DataTable({
                     processing: true,
                     serverSide: true,
@@ -176,6 +194,37 @@
                 $('.btnSubmit').text('Create');
             }
 
+            function showDetailModal(e) {
+                let id = e.getAttribute('data-id');
+
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    type: "GET",
+                    url: "/detail-transaksi/" + notransaksi + "/" +
+                        id,
+                    success: function(response) {
+                        let result = response.data;
+                        $('#no_transaksis').text(result.no_transaksi);
+                        $('#kode_barangs').text(result.kode_barang);
+                        $('#harga_belis').text(formatRupiah(result.harga_beli));
+                        $('#quantitys').text(result.quantity);
+                        $('#diskon_barangs').text(result.diskon_barang + "%");
+                        $('#total_diskon_barangs').text(formatRupiah(result.total_diskon_barang));
+                        $('#total_harga_belis').text(formatRupiah(result.total_harga_beli));
+                        // $('#uuid').text(result.uuid);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert(jqXHR.responseText);
+                    }
+                });
+                // $('#detailPembelianForm')[0].reset();
+                $('#modalDetailPembelian').modal('show');
+                // $('.modal-title').text('Edit Pembelian');
+                // $('.btnSubmit').text('Update');
+            }
+
             function showEditModal(e) {
                 let id = e.getAttribute('data-id');
 
@@ -187,12 +236,14 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     type: "GET",
-                    url: "transaksi/" + id,
+                    url: "/detail-transaksi/" + notransaksi + "/" +
+                        id,
                     success: function(response) {
                         let result = response.data;
-                        $('#no_transaksi').val(result.no_transaksi);
-                        $('#kode_supplier').val(result.kode_supplier);
-                        $('#tanggal_beli').val(result.tanggal_beli);
+                        $('#kode_barang').val(result.kode_barang);
+                        $('#harga_beli').val(result.harga_beli);
+                        $('#quantity').val(result.quantity);
+                        $('#diskon_barang').val(result.diskon_barang);
                         $('#uuid').val(result.uuid);
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
@@ -200,7 +251,7 @@
                     }
                 });
                 // $('#detailPembelianForm')[0].reset();
-                $('#modalForm').modal('show');
+                $('#modalFormDetail').modal('show');
                 $('.modal-title').text('Edit Pembelian');
                 $('.btnSubmit').text('Update');
             }
@@ -217,28 +268,30 @@
                     cancelButtonColor: "#d33",
                     confirmButtonText: "Yes, delete it!"
                 }).then((result) => {
-                    $.ajax({
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        type: "DELETE",
-                        url: "transaksi/" + id,
-                        dataType: "json",
-                        success: function(response) {
-                            // $('#modalForm').modal('hide');
-                            $('#data-table').DataTable().ajax.reload();
-                            if (result.isConfirmed) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            type: "DELETE",
+                            url: "/detail-transaksi/" + notransaksi + "/" + id,
+                            dataType: "json",
+                            success: function(response) {
+                                // $('#modalForm').modal('hide');
+                                $('#data-table').DataTable().ajax.reload();
+
                                 Swal.fire({
                                     title: "Deleted!",
                                     text: response.message,
                                     icon: "success"
                                 });
+
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                console.log(errorThrown);
                             }
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            console.log(errorThrown);
-                        }
-                    })
+                        })
+                    }
                 });
             }
             //Store dan Update data
@@ -252,7 +305,7 @@
                 method = "POST";
 
                 if (save_method == 'update') {
-                    url = "transaksi/" + $('#uuid').val();
+                    url = "/detail-transaksi/" + notransaksi + "/" + $('#uuid').val();
                     formData.append('_method', 'PUT');
                 }
 

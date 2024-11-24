@@ -62,4 +62,5 @@ class PembelianService
         // dd($pembelian->pluck('id')->isEmpty() ? 'B' . date('Ym') . str_pad(1, 3, '0', STR_PAD_LEFT) : 'B' . date('Ym') . str_pad($pembelian->pluck('id')->last() + 1, 3, '0', STR_PAD_LEFT));
         return view('pembelian.index', compact('supplier'));    
     }
+    
 }

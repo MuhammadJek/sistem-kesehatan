@@ -18,6 +18,6 @@ class Stock extends Model
 
     public function barang()
     {
-        $this->belongsTo(Barang::class, 'kode_barang');
+        return $this->belongsTo(Barang::class, 'kode_barang', 'kode_barang');   
     }
 }

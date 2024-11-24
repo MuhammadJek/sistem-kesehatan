@@ -13,10 +13,15 @@ use Yajra\DataTables\DataTables;
 class PembelianController extends Controller
 {
 
-    public function __construct(private PembelianService $service) {}
+    public function __construct(private PembelianService $service)
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      */
+
+
     public function index()
     {
         return  $this->service->getDataTable();

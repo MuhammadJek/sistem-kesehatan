@@ -33,8 +33,7 @@
                         <input type="number" class="form-control" id="quantity" name="quantity" required>
                     </div>
                     <div class="mb-3">
-                        <label for="diskon_barang">Diskon
-                        </label>
+                        <label for="diskon_barang">Diskon (%)</label>
                         <input type="number" class="form-control" id="diskon_barang" name="diskon_barang"
                             min="1" max="100" required>
                     </div>

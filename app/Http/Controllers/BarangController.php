@@ -11,6 +11,10 @@ use Yajra\DataTables\DataTables;
 
 class BarangController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function index(Request $request)
     {
         $product = Barang::latest()->get();

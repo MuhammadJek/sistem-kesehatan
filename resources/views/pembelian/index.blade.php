@@ -9,8 +9,7 @@
                 <h1>Daftar Pembelian</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
-                    <div class="breadcrumb-item"><a href="#">Pembelian</a></div>
-                    {{-- <div class="breadcrumb-item">Default Layout</div> --}}
+                    <div class="breadcrumb-item">Pembelian</div>
                 </div>
             </div>
 
@@ -25,8 +24,22 @@
 
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered my-3" id="data-table">
+                        <div class="table-responsive py-2">
+                            <div class="row mb-3 pl-3">
+                                <div class="col-md-3">
+                                    {{-- <input type="text" id="kode_suppliers" placeholder="Search Column" data-column="2"> --}}
+                                    <span class="text-sm">Filter Supplier</span>
+                                    <select name="" id="" class="form-control filter-select"
+                                        data-column="2">
+                                        <option value="">--Filter Supplier--</option>
+                                        @foreach ($supplier as $suppliers)
+                                            <option value="{{ $suppliers->kode_supplier }}">{{ $suppliers->nama_supplier }}
+                                                - {{ $suppliers->kode_supplier }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <table class="table table-bordered my-1" id="data-table">
                                 <thead>
                                     <tr>
                                         <th>id</th>
@@ -63,11 +76,17 @@
             });
 
             function pembelianTable() {
-                $('#data-table').DataTable({
+                var table = $('#data-table').DataTable({
                     processing: true,
                     serverSide: true,
                     responsive: true,
-                    ajax: "{{ route('transaksi.index') }}",
+                    ajax: {
+                        url: "{{ route('transaksi.index') }}",
+                        data: function(d) {
+                            d.kode_suppliers = $('#kode_suppliers').val();
+
+                        },
+                    },
                     columns: [{
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',
@@ -96,6 +115,10 @@
                     ],
 
                 });
+                $('.filter-select').change(function() {
+                    table.column($(this).data('column')).search($(this).val()).draw();
+                });
+
             }
 
             function resetValidation() {

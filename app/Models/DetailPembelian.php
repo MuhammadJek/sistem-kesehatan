@@ -22,11 +22,11 @@ class DetailPembelian extends Model
 
     public function header_pembelian()
     {
-        $this->belongsTo(HeaderPembelian::class, 'no_transaksi');
+        return   $this->belongsTo(HeaderPembelian::class, 'no_transaksi');
     }
 
     public function barang()
     {
-        $this->belongsTo(Barang::class, 'kode_barang');
+        return $this->belongsTo(Barang::class, 'kode_barang');
     }
 }
